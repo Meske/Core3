@@ -41,12 +41,12 @@
 --which carries forward this exception.
 
 --Determines how often exceptional and legendary items can drop.
-yellowChance = 1000 -- 1 in 1,000
-exceptionalChance = 100000 --1 in 100,000
-legendaryChance = 1000000 --1 in 1,000,000
---yellowChance = 50 --1 in 50 for testing
---exceptionalChance = 100 --1 in 100 for testing
---legendaryChance = 1000 --1 in 1000 for testing
+--yellowChance = 1000 -- 1 in 1,000
+--exceptionalChance = 100000 --1 in 100,000
+--legendaryChance = 1000000 --1 in 1,000,000
+yellowChance = 1 --1 in 50 for testing
+exceptionalChance = 1 --1 in 100 for testing
+legendaryChance = 1 --1 in 1000 for testing
 
 --Determines how much of an increase in the base stats will be applied to the object.
 yellowModifier = 1.5
@@ -54,7 +54,8 @@ exceptionalModifier = 2.5
 legendaryModifier = 5.0
 
 --The chance for random skill mods to be on looted weapons/wearables
-skillModChance = 500 -- 1 in 500
+--skillModChance = 500 -- 1 in 500
+skillModChance = 5 -- 1 in 500
 
 -- Value ranges for random dots on looted weapons (chance is set individually on the loot items)
 randomDotAttribute = {0, 8} -- See CreatureAttributes.h in src for numbers.
@@ -252,7 +253,24 @@ lootableClothingAttachmentStatMods = {
 	"warcry",
 	"weapon_assembly",
 	"weapon_experimentation",
-	"weapon_repair"
+	"weapon_repair",
+	--jedi skills added for testing
+	"onehandlightsaber_accuracy",
+	"onehandlightsaber_speed",
+	"twohandlightsaber_accuracy",
+	"twohandlightsaber_speed",
+	"polearmlightsaber_accuracy",
+	"polearmlightsaber_speed",
+	"saber_block",
+	"lightsaber_toughness",
+	"jedi_saber_assembly",
+	"jedi_saber_experimentation",
+	"jedi_force_power_max",
+	"jedi_force_power_regen",
+	"force_defense",
+	"jedi_state_defense",
+	"jedi_toughness"
+	
 }
 
 lootableArmorStatMods = {
