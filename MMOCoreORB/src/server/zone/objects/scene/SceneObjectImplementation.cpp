@@ -43,6 +43,7 @@
 
 #include <fstream>
 #include <sys/stat.h>
+#include <iomanip>
 
 void SceneObjectImplementation::initializeTransientMembers() {
 	ManagedObjectImplementation::initializeTransientMembers();
@@ -157,11 +158,14 @@ void SceneObjectImplementation::loadTemplateData(SharedObjectTemplate* templateD
 
 	dataObjectComponent = ComponentManager::instance()->getDataObjectComponent(templateData->getDataObjectComponent());
 
-
 	if (!isCreatureObject() && !isLairObject() && gameObjectType != SceneObjectType::FURNITURE) {
 		if (templateData->getCollisionMaterialFlags() && templateData->getCollisionMaterialBlockFlags() && templateData->isNavUpdatesEnabled()) {
 			collidableObject = true;
 		}
+	}
+
+	if (templateObject->getDelayedContainerLoad()) {
+		containerObjects.setDelayedLoadOperationMode();
 	}
 }
 
@@ -458,13 +462,13 @@ void SceneObjectImplementation::sendSlottedObjectsTo(SceneObject* player) {
 	VectorMap<String, ManagedReference<SceneObject* > > slotted;
 	getSlottedObjects(slotted);
 
-	SortedVector<SceneObject*> objects(slotted.size(), slotted.size());
+	SortedVector<uint64> objects(slotted.size(), slotted.size());
 	objects.setNoDuplicateInsertPlan();
 
 	for (int i = 0; i < slotted.size(); ++i) {
 		SceneObject* object = slotted.get(i);
 
-		if (objects.put(object) != -1) {
+		if (objects.put(object->getObjectID()) != -1) {
 			if (object->isInQuadTree()) {
 				notifyInsert(object);
 			} else {
@@ -862,7 +866,6 @@ void SceneObjectImplementation::updateVehiclePosition(bool sendPackets) {
 	parent->incrementMovementCounter();
 
 	parent->updateZone(false, sendPackets);
-	parent->asCreatureObject()->updateCOV();
 }
 
 void SceneObjectImplementation::updateZone(bool lightUpdate, bool sendPackets) {
@@ -1046,11 +1049,11 @@ Reference<SceneObject*> SceneObjectImplementation::getParentRecursively(uint32 g
 		return NULL;
 
 	if (temp->getGameObjectType() == gameObjectType)
-		return temp;
+		return std::move(temp);
 
 	while ((temp = temp->getParent().get()) != NULL && temp != asSceneObject()) {
 		if (temp->getGameObjectType() == gameObjectType) {
-			return temp;
+			return std::move(temp);
 		}
 	}
 
@@ -1662,7 +1665,7 @@ bool SceneObjectImplementation::isDecoration() {
 }
 
 Reference<SceneObject*> SceneObjectImplementation::getContainerObjectRecursive(uint64 oid) {
-	ManagedReference<SceneObject*> obj = containerObjects.get(oid);
+	Reference<SceneObject*> obj = containerObjects.get(oid);
 
 	if (obj != NULL)
 		return obj;
@@ -1764,7 +1767,7 @@ Reference<SceneObject*> SceneObjectImplementation::getCraftedComponentsSatchel()
 		craftingComponentsSatchel = craftingComponents->getContainerObject(0);
 	}
 
-	return craftingComponentsSatchel;
+	return std::move(craftingComponentsSatchel);
 }
 
 int SceneObjectImplementation::getArrangementDescriptorSize() {

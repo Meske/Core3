@@ -39,6 +39,9 @@ option(ENABLE_NATIVE "Enables -march=native compiler option" ON)
 option(ENABLE_OMIT_FRAMEPOINTER "Enables -fno-omit-frame-pointer compiler option" ON)
 option(ENABLE_ERROR_ON_WARNINGS "Enables -Werror compiler option" ON)
 option(ENABLE_REST_SERVER "Enables RESTServer if cpprestsdk is found" OFF)
+option(ENABLE_ODB "Enables odb3 compiling" OFF)
+option(ENABLE_ODB_REFERENCES "Sets ODB_REFERENCES define" ON) #needs to match engine3
+option(ENABLE_BUILD_CLIENT "Enables core3client build" ON)
 
 # Set cmake paths
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
@@ -142,6 +145,10 @@ include_directories(${CMAKE_SOURCE_DIR}/src)
 include_directories(${CMAKE_SOURCE_DIR}/src/autogen)
 include_directories(${CMAKE_SOURCE_DIR}/utils)
 
+if (ENABLE_ODB_REFERENCES)
+	add_definitions(-DODB_REFERENCES)
+endif()
+
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     # Define global build gcc compatible flags to check and add if available
     set(GCCEXTRAFLAGS -Wall
@@ -219,7 +226,10 @@ add_subdirectory(src/server/web)
 add_subdirectory(src/server/ping)
 add_subdirectory(src/server/login)
 add_subdirectory(src/server/chat)
-add_subdirectory(src/client)
+
+if (ENABLE_BUILD_CLIENT)
+	add_subdirectory(src/client)
+endif()
 
 set_source_files_properties(tags PROPERTIES GENERATED true)
 add_custom_target(tags
@@ -248,4 +258,4 @@ elseif (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
 endif ()
 #message(STATUS "Compiler cxx min size flags:" ${CMAKE_CXX_FLAGS_MINSIZEREL})
 message(STATUS "Compiler extra cxx flags:" ${CMAKE_CXX_FLAGS})
-message(STATUS "Available targets: tags compdb update-engine3 core3 idl rebuild-idl")
+message(STATUS "Available targets: tags compdb update-engine3 core3 odb3 idl rebuild-idl")
